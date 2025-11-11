@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Taller Práctico: Boosting para E-commerce</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            /* Cambio 1: Fondo alusivo */
+            background-image: url('https://images.unsplash.com/photo-1555529669-e69e7aa0ba9a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80');
+            background-size: cover;
+            background-attachment: fixed;
+            background-position: center;
+        }
+        pre {
+            background-color: #1f2937; /* bg-gray-800 */
+            color: #d1d5db; /* text-gray-300 */
+            padding: 1rem;
+            border-radius: 0.5rem; /* rounded-lg */
+            overflow-x: auto;
+            font-family: 'Courier New', Courier, monospace;
+        }
+        code {
+            font-family: 'Courier New', Courier, monospace;
+        }
+        h1, h2, h3 {
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+    <div class="container mx-auto max-w-4xl p-6 sm:p-10 bg-white bg-opacity-95 rounded-xl shadow-lg my-10">
+
+        <!-- Encabezado -->
+        <div class="text-center border-b border-gray-200 pb-6 mb-8">
+            <h1 class="text-3xl sm:text-4xl font-bold text-indigo-700">Taller Práctico: Boosting para Conversión E-commerce</h1>
+            <p class="text-lg text-gray-600 mt-2">De los Datos del Clickstream a la Decisión de Negocio</p>
+        </div>
+
+        <!-- Introducción y Objetivo de Negocio -->
+        <section class="mb-8">
+            <h2 class="text-2xl font-semibold text-gray-900 mb-4">1. El Escenario: Tu Rol como Analista de BI</h2>
+            <p class="text-base leading-relaxed">
+                ¡Felicidades! Eres el nuevo Analista de Inteligencia de Negocios en una prometedora plataforma de e-commerce. Tu primer gran proyecto es analizar el comportamiento de los usuarios en el sitio web para entender qué factores llevan a una compra.
+            </p>
+            <p class="text-base leading-relaxed mt-4">
+                La gerencia no solo quiere saber *qué* pasó, sino *qué es probable que pase*. Quieren un modelo que pueda predecir, basándose en la sesión de un usuario, si esa sesión terminará en una compra (la variable `Revenue`).
+            </p>
+            <p class="text-base font-semibold leading-relaxed mt-4 text-indigo-600">
+                **Tu Objetivo de Negocio:** Construir y evaluar un modelo de Machine Learning que prediga la probabilidad de compra (`Revenue`) y, lo más importante, que identifique los *impulsores clave* (key drivers) de la conversión para que el equipo de Marketing pueda tomar acciones.
+            </p>
+        </section>
+
+        <!-- El Dataset -->
+        <section class="mb-8">
+            <h2 class="text-2xl font-semibold text-gray-900 mb-4">2. El Dataset: Online Shoppers Purchasing Intention</h2>
+            <p class="text-base leading-relaxed">
+                Usaremos un dataset clásico de la UCI Machine Learning Repository. Contiene datos de clickstream de 12,330 sesiones de usuarios.
+            </p>
+            <ul class="list-disc list-inside bg-gray-50 p-4 rounded-md mt-4">
+                <li class="mb-2"><strong>Target (y):</strong> `Revenue` (bool) - ¿La sesión terminó en compra?</li>
+                <li class="mb-2"><strong>Features (X):</strong> 17 atributos que incluyen:
+                    <ul class="list-decimal list-inside ml-6 mt-1">
+                        <li>Cuántas páginas de tipo `Administrative`, `Informational` y `ProductRelated` visitó.</li>
+                        <li>La duración total en esas páginas.</li>
+                        <li>Métricas de engagement como `BounceRates` y `ExitRates`.</li>
+                        <li>Datos categóricos como `Month`, `VisitorType` y `Weekend`.</li>
+                    </ul>
+                </li>
+            </ul>
+            
+            <!-- Cambio 2: Tabla de Variables -->
+            <h3 class="text-lg font-semibold text-gray-800 mt-6 mb-2">Descripción de las Variables</h3>
+            <div class="overflow-x-auto rounded-lg border border-gray-200 shadow-sm">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Variable</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipo</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Descripción</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Administrative</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Numérico (int)</td><td class="px-6 py-4 text-sm text-gray-500">Número de páginas administrativas visitadas.</td></tr>
+                        <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Administrative_Duration</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Numérico (float)</td><td class="px-6 py-4 text-sm text-gray-500">Tiempo total en páginas administrativas.</td></tr>
+                        <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Informational</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Numérico (int)</td><td class="px-6 py-4 text-sm text-gray-500">Número de páginas informativas visitadas.</td></tr>
+                        <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Informational_Duration</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Numérico (float)</td><td class="px-6 py-4 text-sm text-gray-500">Tiempo total en páginas informativas.</td></tr>
+                        <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">ProductRelated</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Numérico (int)</td><td class="px-6 py-4 text-sm text-gray-500">Número de páginas de productos visitadas.</td></tr>
+                        <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">ProductRelated_Duration</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Numérico (float)</td><td class="px-6 py-4 text-sm text-gray-500">Tiempo total en páginas de productos.</td></tr>
+                        <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">BounceRates</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Numérico (float)</td><td class="px-6 py-4 text-sm text-gray-500">Tasa de rebote de la sesión (Google Analytics).</td></tr>
+                        <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">ExitRates</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Numérico (float)</td><td class="px-6 py-4 text-sm text-gray-500">Tasa de salida de la sesión (Google Analytics).</td></tr>
+                        <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">PageValues</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Numérico (float)</td><td class="px-6 py-4 text-sm text-gray-500">Valor promedio de la página (Google Analytics).</td></tr>
+                        <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">SpecialDay</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Numérico (float)</td><td class="px-6 py-4 text-sm text-gray-500">Proximidad a un día especial (ej. 0 = no, 1 = muy cerca).</td></tr>
+                        <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Month</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Categórico (object)</td><td class="px-6 py-4 text-sm text-gray-500">Mes de la visita.</td></tr>
+                        <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">OperatingSystems</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Categórico (int)</td><td class="px-6 py-4 text-sm text-gray-500">ID del sistema operativo.</td></tr>
+                        <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Browser</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Categórico (int)</td><td class="px-6 py-4 text-sm text-gray-500">ID del navegador.</td></tr>
+                        <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Region</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Categórico (int)</td><td class="px-6 py-4 text-sm text-gray-500">ID de la región.</td></tr>
+                        <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">TrafficType</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Categórico (int)</td><td class="px-6 py-4 text-sm text-gray-500">ID del tipo de tráfico (ej. Google, Banner, etc.).</td></tr>
+                        <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">VisitorType</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Categórico (object)</td><td class="px-6 py-4 text-sm text-gray-500">Tipo de visitante (New_Visitor, Returning_Visitor, Other).</td></tr>
+                        <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Weekend</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Categórico (bool)</td><td class="px-6 py-4 text-sm text-gray-500">Si la visita fue en fin de semana.</td></tr>
+                        <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Revenue</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Target (bool)</td><td class="px-6 py-4 text-sm text-gray-500">Si la sesión resultó en compra.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <!-- Fin Cambio 2 -->
+
+            <!-- Cambio 3: Enlace de dataset eliminado -->
+            <p class="text-base leading-relaxed mt-4">
+                Se les proveerá el archivo `online_shoppers_intention.csv` para este taller. Su primera tarea es cargarlo en un DataFrame de Pandas.
+            </p>
+        </section>
+
+        <!-- Paso 1: Exploración y Limpieza -->
+        <section class="mb-8">
+            <h2 class="text-2xl font-semibold text-gray-900 mb-4">3. Paso 1: Exploración y Depuración de Datos (EDA)</h2>
+            <p class="text-base leading-relaxed">
+                ¡Manos a la obra! Carga el dataset en un DataFrame de Pandas y comienza a "depurarlo".
+            </p>
+            <ul class="list-disc list-inside mt-4 space-y-2">
+                <li>Usa `df.info()` y `df.describe()` para entender los tipos de datos y las distribuciones.</li>
+                <li>¿Hay valores nulos? ¿Cómo deberías manejarlos? (Pista: `SimpleImputer` será tu amigo).</li>
+                <li>La variable `Revenue` es booleana (True/False). Conviértela a numérica (1/0) para que los modelos puedan usarla.</li>
+                <li><strong>¡Pregunta Clave!</strong> ¿Cómo es la distribución de `Revenue`? Usa `df['Revenue'].value_counts(normalize=True)`. ¿Es un problema balanceado o desbalanceado? Esto será *crítico* para el Paso 4.</li>
+            </ul>
+        </section>
+
+        <!-- Paso 2: Preprocesamiento y Pipelines -->
+        <section class="mb-8">
+            <h2 class="text-2xl font-semibold text-gray-900 mb-4">4. Paso 2: El Pipeline de Preprocesamiento</h2>
+            <p class="text-base leading-relaxed">
+                Tal como vimos en el laboratorio, no procesaremos los datos manualmente. Usaremos un `Pipeline` y un `ColumnTransformer` para crear un flujo de trabajo profesional y evitar *data leakage*.
+            </p>
+            <p class="text-base leading-relaxed mt-4">
+                Tu dataset tiene una mezcla de variables que necesitan diferente tratamiento.
+            </p>
+
+            <!-- Cambio 4: Pistas de código eliminadas -->
+            <p class="text-base font-medium text-gray-700 mt-6">
+                Tu tarea aquí es definir correctamente qué variables son `numéricas` (aquellas que deben ser escaladas) y cuáles son `categóricas` (aquellas que necesitan One-Hot Encoding).
+            </p>
+            <p class="text-base leading-relaxed mt-2">
+                Luego, deberás construir un `ColumnTransformer` que aplique las transformaciones correctas (Imputación + Escalado para numéricas; Imputación + OneHotEncoding para categóricas). ¡Consulta la documentación de Scikit-learn y el notebook del laboratorio!
+            </p>
+
+        </section>
+
+        <!-- Paso 3: Modelado -->
+        <section class="mb-8">
+            <h2 class="text-2xl font-semibold text-gray-900 mb-4">5. Paso 3: "Jugando" con los Modelos</h2>
+            <p class="text-base leading-relaxed">
+                ¡Es hora de "jugar"! Tu tarea es construir, entrenar y evaluar al menos **cuatro** modelos diferentes para ver cuál funciona mejor "out-of-the-box".
+            </p>
+            <!-- Cambio 5: Árbol de Decisión añadido -->
+            <ul class="list-disc list-inside mt-4 space-y-2">
+                <li><strong>Modelo 1 (Línea Base 1):</strong> `LogisticRegression`.</li>
+                <li><strong>Modelo 2 (Línea Base 2):</strong> `DecisionTreeClassifier`. (¡Un solo árbol para comparar!)</li>
+                <li><strong>Modelo 3 (Bagging):</strong> `RandomForestClassifier`. El campeón de la Sesión 1.</li>
+                <li><strong>Modelo 4 (Boosting):</strong> `XGBClassifier` o `LGBMClassifier`. El campeón de esta sesión.</li>
+            </ul>
+
+            <!-- Cambio 4: Pista de código eliminada -->
+            <p class="text-base leading-relaxed mt-6">
+                Para cada uno de estos modelos, deberás crear un `Pipeline` completo que incluya tu `preprocessor` y el `model`.
+            </p>
+            <p class="text-base font-semibold text-indigo-600 leading-relaxed mt-4">
+                ¡Pista Importante! No olvides el desbalanceo de clases. Para los modelos que lo soportan (como `RandomForestClassifier` y `XGBClassifier`), investiga y usa los parámetros `class_weight='balanced'` o `scale_pos_weight`.
+            </p>
+
+        </section>
+
+        <!-- Paso 4: Evaluación -->
+        <section class="mb-8">
+            <h2 class="text-2xl font-semibold text-gray-900 mb-4">6. Paso 4: Evaluación y Selección del Modelo</h2>
+            <p class="text-base leading-relaxed">
+                Con los modelos entrenados, es hora de decidir cuál es el "mejor".
+            </p>
+            <p class="text-base font-semibold text-red-600 leading-relaxed mt-4">
+                ¡ALERTA! Como viste en el Paso 1, este es un problema **altamente desbalanceado**. Si usas solo `accuracy` (precisión), un modelo que prediga "No Compra" el 100% de las veces tendrá un accuracy altísimo y será 100% inútil.
+            </p>
+            <p class="text-base leading-relaxed mt-4">
+                Tu tarea es crear un `DataFrame` que compare tus modelos usando métricas más robustas. Debes incluir:
+            </p>
+            <ul class="list-disc list-inside mt-4 space-y-2">
+                <li>`accuracy_score` (para ver por qué no sirve)</li>
+                <li>`f1_score(y_test, y_pred, pos_label=1)`</li>
+                <li>`roc_auc_score(y_test, y_prob)`</li>
+                <li>`precision_score(y_test, y_pred, pos_label=1)`</li>
+                <li>`recall_score(y_test, y_pred, pos_label=1)`</li>
+            </ul>
+        </section>
+
+        <!-- Paso 5: Conclusión de Negocio -->
+        <section>
+            <h2 class="text-2xl font-semibold text-gray-900 mb-4">7. Paso 5: La Decisión de Negocio (El Entregable)</h2>
+            <p class="text-base leading-relaxed">
+                Esta es la parte más importante para un analista de BI. El mejor modelo técnico no sirve de nada si no podemos traducirlo en una acción de negocio.
+            </p>
+            <p class="text-base leading-relaxed mt-4">
+                Responde a las siguientes preguntas en tu notebook como si fuera un reporte para la Gerencia de Marketing:
+            </p>
+            <ol class="list-decimal list-inside mt-4 space-y-3 bg-indigo-50 p-6 rounded-md">
+                <li><strong>¿Qué modelo elegiste como "ganador" y por qué?</strong> (Justifica usando las métricas del Paso 4. Ej. "Elegí XGBoost porque, aunque su accuracy fue similar, tuvo un ROC AUC 20% superior, lo que indica que es mucho mejor para distinguir entre compradores y no compradores...").</li>
+                <li>
+                    <strong>¿Cuáles son los 3 factores más importantes?</strong> 
+                    (Extrae el `feature_importance_` de tu modelo ganador. Usa la función del laboratorio para obtener los nombres correctos de las features después del One-Hot Encoding).
+                </li>
+                <li>
+                    <strong>¿Cuál es tu recomendación de negocio?</strong> 
+                    (Basado en las 3 features más importantes. Ej. "El factor más importante es `PageValues`. Recomiendo al equipo de UX/UI enfocarse en optimizar el valor de las páginas de productos, ya que esto impacta directamente la conversión...")
+                </li>
+            </ol>
+        </section>
+
+    </div>
+
+</body>
+</html>
+
