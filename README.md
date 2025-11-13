@@ -1,0 +1,1 @@
+Proyecto de comparación de modelos. Caso de propensión de compra con historial (log) de clicks en tienda virtual.
